@@ -1,0 +1,16 @@
+{
+  "name": "google-ai-pro-cdk-vercel",
+  "version": "1.0.0",
+  "description": "Google AI Pro 12 Tháng - Hệ thống tự động hóa kích hoạt bằng mã CDK (Tích hợp Tiện ích Tiêm Offer 2 Năm)",
+  "main": "server/remote-browser.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "node server/remote-browser.js",
+    "build": "echo 'Static & Serverless ready for Vercel'"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.17.0",
+    "playwright-core": "^1.44.0"
+  }
+}

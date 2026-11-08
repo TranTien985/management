@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google AI Pro 12 Tháng - Tự Động Hóa Kích Hoạt Bằng Mã CDK</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #070b14; color: #f1f5f9; margin: 0; overflow-x: hidden; }
+    .glow-box { box-shadow: 0 0 35px -5px rgba(37, 99, 235, 0.22), 0 10px 25px -5px rgba(0, 0, 0, 0.6); }
+    .glow-green { box-shadow: 0 0 30px -5px rgba(16, 185, 129, 0.25); }
+    .step-card { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    .step-card.active { border-color: #3b82f6; background: linear-gradient(180deg, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.9) 100%); box-shadow: 0 0 20px rgba(59, 130, 246, 0.25); }
+    .step-card.done { border-color: rgba(16, 185, 129, 0.45); background: linear-gradient(180deg, rgba(6, 78, 59, 0.3) 0%, rgba(15, 23, 42, 0.85) 100%); }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    /* Google authentic inner styling */
+    .g-input { border: 1px solid #747775; border-radius: 4px; padding: 13px 15px; font-size: 16px; color: #1f1f1f; width: 100%; outline: none; transition: border 0.15s; background: #fff; }
+    .g-input:focus { border: 2px solid #0b57d0; padding: 12px 14px; }
+    .g-btn-primary { background-color: #0b57d0; color: #ffffff; font-weight: 500; border-radius: 20px; padding: 10px 24px; font-size: 14px; transition: background 0.15s, box-shadow 0.15s; }
+    .g-btn-primary:hover { background-color: #0842a0; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .g-plan-card { border: 1px solid #dadce0; border-radius: 16px; background: #ffffff; padding: 24px; transition: box-shadow 0.2s, border-color 0.2s; }
+    .g-plan-card:hover { box-shadow: 0 4px 12px rgba(60,64,67,0.12); }
+    /* Extension Popup exact styling from popup.html */
+    .ext-popup-bg { background: linear-gradient(150deg, #eef3ff 0, #f7f9fc 180px); color: #28354a; }
+    .ext-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border: 1px solid transparent; border-radius: 9px; cursor: pointer; transition: background .15s, border-color .15s; }
+    .ext-row:hover { background: #f5f7fc; }
+    .ext-row.checked { background: #edf3ff; border-color: #cddcff; color: #2457bd; font-weight: 500; }
+    .ext-tag { font-size: 10px; line-height: 20px; padding: 0 7px; border-radius: 6px; color: #718096; background: #f0f3f8; }
+    .ext-row.checked .ext-tag { color: #2457bd; background: #dce8ff; }
+    @keyframes pulse-fast { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+    .animate-pulse-fast { animation: pulse-fast 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#070b14] text-slate-100 selection:bg-blue-600 selection:text-white">
+
+  <!-- TOP NAVIGATION BAR (Matches video header) -->
+  <header class="sticky top-0 z-40 bg-[#0b1120]/95 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-2.5">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-600 flex items-center justify-center font-extrabold text-white text-sm shadow-md shadow-indigo-500/30">
+          AI
+        </div>
+        <div>
+          <h1 class="text-sm sm:text-base font-bold tracking-tight text-white flex items-center gap-2">
+            <span>Google AI Pro 12 Tháng - Tự Động Hóa Kích Hoạt Bằng Mã CDK</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Right Controls & Server Status -->
+      <div class="flex items-center flex-wrap gap-2">
+        <!-- Toggle Extension Popup Drawer -->
+        <button id="btnOpenExtModal" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-blue-300 border border-blue-500/30 flex items-center gap-1.5 transition">
+          <span class="w-4 h-4 rounded bg-slate-900 text-[10px] font-bold flex items-center justify-center text-white border border-slate-600">2Y</span>
+          <span>Tiện ích Tiêm Pro (2 Năm)</span>
+        </button>
+
+        <!-- Toggle CDK Admin / Generator -->
+        <button id="btnOpenAdminModal" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-amber-300 border border-amber-500/30 flex items-center gap-1.5 transition">
+          <span>🔑 Quản lý CDK</span>
+        </button>
+
+        <!-- Toggle Cancel Renewal / Check Plan Simulator (Video 03:18-04:02) -->
+        <button id="btnOpenPostCheck" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800/90 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 transition">
+          <span>🛡️ Kiểm tra Gói & Hủy Gia Hạn</span>
+        </button>
+
+        <!-- Server Connected Pill -->
+        <div id="serverStatusBadge" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-950/90 text-emerald-400 border border-emerald-500/40 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Đã kết nối máy chủ</span>
+        </div>
+
+        <!-- Stop / Reset Session Button (Shown when active, exact match with video) -->
+        <button id="btnStopSession" type="button" class="hidden px-3.5 py-1.5 rounded-lg text-xs font-bold bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 flex items-center gap-1.5 transition">
+          <span>✕ Dừng / Làm Lại</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 py-4 space-y-4">
+
+    <!-- 1. TOP HERO STATUS BANNER (Dynamic based on Idle / Stopped / Running / Success) -->
+    <section id="heroBanner" class="rounded-2xl border border-slate-800 bg-gradient-to-b from-[#111a2e] to-[#0b1222] p-4 sm:p-5 text-center relative overflow-hidden glow-box">
+      <div id="heroTopPills" class="flex flex-wrap items-center justify-center gap-2 mb-2">
+        <span id="heroPillState" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+          ● SẴN SÀNG
+        </span>
+        <span id="heroPillCdkInfo" class="px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-950/90 text-emerald-300 border border-emerald-500/40">
+          ⚡ MÃ VIP-12M-0003: CHƯA TRỪ LƯỢT (VẪN CÒN 1 LẦN KÍCH HOẠT)
+        </span>
+      </div>
+
+      <h2 id="heroTitle" class="text-base sm:text-xl font-extrabold text-white tracking-tight">
+        Đã đóng cửa sổ kích hoạt — Mã VIP-12M-0003 KHÔNG bị trừ lượt!
+      </h2>
+      <p id="heroSubtitle" class="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl mx-auto">
+        Mã VIP-12M-0003 vẫn còn nguyên 1 lần kích hoạt. Bạn có thể bấm Bắt Đầu để dùng lại bất cứ lúc nào!
+      </p>
+    </section>
+
+    <!-- 2. CDK INPUT & ACTION CARD (Exact layout from video) -->
+    <section class="rounded-2xl border border-slate-800/90 bg-[#0d1527] p-4 sm:p-5 space-y-3.5 shadow-xl">
+      <!-- Top Row: Label + Remaining Credits Badge + Offer Mode Selector -->
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <label for="cdkInput" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+          <span>🔑 NHẬP MÃ KÍCH HOẠT (CDK):</span>
+        </label>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Offer Tier Selector synced with Extension -->
+          <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-700/80 rounded-lg px-2.5 py-1 text-xs">
+            <span class="text-slate-400 font-medium">Chế độ tiêm:</span>
+            <select id="offerLayerSelect" class="bg-transparent text-blue-400 font-bold focus:outline-none cursor-pointer">
+              <option value="12m" class="bg-slate-900 text-white">Lựa chọn 1 · 12 tháng (Lần đầu)</option>
+              <option value="6m_ss" class="bg-slate-900 text-white">Lựa chọn 2 · 6 tháng (SS - Tiếp theo)</option>
+              <option value="6m" class="bg-slate-900 text-white">Lựa chọn 3 · 6 tháng (Tiếp theo)</option>
+              <option value="6m_2" class="bg-slate-900 text-white">Dự phòng · 6 tháng (Dự phòng)</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-1.5 text-xs">
+            <span class="text-slate-400">🎟️ Số lượt còn lại:</span>
+            <span id="cdkRemainingBadge" class="px-2.5 py-1 rounded-md font-bold bg-emerald-950 text-emerald-400 border border-emerald-500/40">
+              1 lần kích hoạt (Chưa trừ)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Middle Row: Input + Check Button + Start Activation Button -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+        <div class="relative flex-1">
+          <input
+            id="cdkInput"
+            type="text"
+            value="VIP-12M-0003"
+            placeholder="Nhập mã CDK (VD: VIP-12M-0003)..."
+            class="w-full bg-[#070b14] border-2 border-blue-500/80 focus:border-blue-400 rounded-xl px-4 py-2.5 text-sm sm:text-base font-bold text-white tracking-wide uppercase focus:outline-none transition"
+          />
+        </div>
+
+        <button
+          id="btnCheckCdk"
+          type="button"
+          class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600/80 text-xs sm:text-sm font-semibold text-slate-200 flex items-center justify-center gap-1.5 transition shrink-0"
+        >
+          <span>🔍 Kiểm tra mã</span>
+        </button>
+
+        <button
+          id="btnStartActivation"
+          type="button"
+          class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-xs sm:text-sm font-bold text-white shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition shrink-0"
+        >
+          <span>🚀 Bắt Đầu Kích Hoạt Gói 12 Tháng</span>
+        </button>
+      </div>
+
+      <!-- Status Alert Bar inside CDK Card -->
+      <div id="cdkAlertBox" class="rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300">
+        <div class="flex items-center gap-2">
+          <span id="cdkAlertIcon">✅</span>
+          <span id="cdkAlertText">Mã "VIP-12M-0003" hợp lệ — Số lượt còn lại: 1 lần kích hoạt (Thất bại không trừ, thành công mới trừ)</span>
+        </div>
+        <button id="btnQuickResetCdk" type="button" class="text-[11px] underline text-blue-300 hover:text-white shrink-0">
+          + Nạp lại 1 lượt (Test)
+        </button>
+      </div>
+
+      <!-- 3. 5-STEP PROGRESS TRACKER GRID -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+        <!-- Step 1 -->
+        <div id="stepCard1" class="step-card done rounded-xl border border-slate-800 bg-slate-900/70 p-2.5">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">BƯỚC 1 • KHỞI TẠO</div>
+          <div id="stepTitle1" class="text-xs sm:text-sm font-bold text-emerald-400 mt-0.5 flex items-center gap-1">
+            <span>✓ Xoay Proxy Mỹ</span>
+          </div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Tự động gán IP sạch</div>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="stepCard2" class="step-card rounded-xl border border-slate-800 bg-slate-900/70 p-2.5">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">BƯỚC 2 • ĐĂNG NHẬP</div>
+          <div id="stepTitle2" class="text-xs sm:text-sm font-bold text-slate-200 mt-0.5 flex items-center gap-1">
+            <span>🔑 Tài Khoản Google</span>
+          </div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Khách tự nhập tài khoản</div>
+        </div>
+
+        <!-- Step 3 -->
+        <div id="stepCard3" class="step-card rounded-xl border border-slate-800 bg-slate-900/70 p-2.5">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">BƯỚC 3 • NHẬN ƯU ĐÃI</div>
+          <div id="stepTitle3" class="text-xs sm:text-sm font-bold text-slate-200 mt-0.5 flex items-center gap-1">
+            <span>⚡ Tự Tiêm Offer 12M</span>
+          </div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Khách bấm chọn gói</div>
+        </div>
+
+        <!-- Step 4 -->
+        <div id="stepCard4" class="step-card rounded-xl border border-slate-800 bg-slate-900/70 p-2.5">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">BƯỚC 4 • THÊM THẺ</div>
+          <div id="stepTitle4" class="text-xs sm:text-sm font-bold text-slate-200 mt-0.5 flex items-center gap-1">
+            <span>💳 Khách tự nhập thẻ</span>
+          </div>
+          <div class="text-[11px] text-slate-400 mt-0.5">ZIP 97201 &amp; Mua</div>
+        </div>
+
+        <!-- Step 5 -->
+        <div id="stepCard5" class="step-card col-span-2 sm:col-span-1 rounded-xl border border-slate-800 bg-slate-900/70 p-2.5">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">BƯỚC 5 • KẾT QUẢ</div>
+          <div id="stepTitle5" class="text-xs sm:text-sm font-bold text-slate-200 mt-0.5 flex items-center gap-1">
+            <span>⏳ Hoàn tất 12M</span>
+          </div>
+          <div id="stepSub5" class="text-[11px] text-slate-400 mt-0.5">Lỗi bảo nguyên mã</div>
+        </div>
+      </div>
+
+      <!-- Current Process Status Bar (Bottom of CDK card) -->
+      <div id="processStatusBar" class="rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-medium bg-slate-900/90 border border-slate-800 text-slate-300 flex items-center justify-between gap-2">
+        <span id="processStatusText">⏹ Đã dừng / đóng cửa sổ kích hoạt (Không trừ lượt CDK)</span>
+        <span id="proxyIpBadge" class="text-[11px] font-mono text-slate-400">US Residential Proxy: 104.28.194.72 (Oregon, US - ZIP 97201)</span>
+      </div>
+    </section>
+
+    <!-- 4. LIVE REMOTE BROWSER VIEWPORT (Shown when session starts, matches video 00:16 - 03:13) -->
+    <section id="liveViewportSection" class="hidden rounded-2xl border-2 border-blue-500/80 bg-[#0b1324] overflow-hidden shadow-2xl glow-box">
+      <!-- Viewport Header & Quick Paste Toolbar -->
+      <div class="bg-[#101b33] border-b border-slate-800 px-3.5 py-2.5 space-y-2">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div id="viewportStepBanner" class="text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-2">
+            <span>🖥️ Màn Hình Google Trực Tiếp (Đổi mã - Mã ZIP Mỹ: 97201)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-900 text-blue-300 border border-slate-700">
+              ZIP Mỹ: <strong class="text-white">97201</strong>
+            </span>
+            <button id="btnCopyZip" type="button" class="px-2 py-0.5 rounded text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">
+              Copy 97201
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Fill Bar (Exact match with video: "Dán/Gõ nhanh Email, Mật khẩu hoặc Số thẻ rồi bấm: [input] [➜ Điền vào ô đang chọn]") -->
+        <div class="flex flex-wrap items-center gap-2 bg-[#09101f] px-3 py-1.5 rounded-xl border border-slate-800/90">
+          <span class="text-xs text-slate-300 font-medium">Dán/Gõ nhanh Email, Mật khẩu hoặc Số thẻ rồi bấm:</span>
+          <input
+            id="quickPasteInput"
+            type="text"
+            placeholder="Nhập nội dung cần điền nhanh..."
+            class="flex-1 min-w-[180px] bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-white focus:outline-none focus:border-blue-500"
+          />
+          <button
+            id="btnQuickPasteFill"
+            type="button"
+            class="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1 transition"
+          >
+            <span>➜ Điền vào ô đang chọn</span>
+          </button>
+          <!-- Step Jump Helpers for fast testing -->
+          <div class="ml-auto flex items-center gap-1 text-[11px] text-slate-400">
+            <span>Chuyển nhanh:</span>
+            <button type="button" data-jump="login-email" class="step-jump-btn px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">B2: Login</button>
+            <button type="button" data-jump="plans" class="step-jump-btn px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">B3: Chọn Gói</button>
+            <button type="button" data-jump="play-card" class="step-jump-btn px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">B4: Thêm Thẻ</button>
+            <button type="button" data-jump="play-subscribe" class="step-jump-btn px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200">B4.2: Subscribe $0</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inner Browser Screen Container (640px height, authentic white Google canvas) -->
+      <div id="browserCanvas" class="relative w-full min-h-[540px] bg-white text-slate-900 flex flex-col justify-between overflow-y-auto">
+
+        <!-- VIEW 1: INITIALIZING US PROXY (00:16 - 00:20 in video) -->
+        <div id="viewProxyInit" class="hidden flex-1 flex flex-col items-center justify-center bg-[#070b14] text-center p-8 min-h-[540px]">
+          <div class="w-12 h-12 rounded-full border-4 border-blue-500/30 border-t-blue-500 animate-spin mb-4"></div>
+          <h3 class="text-base sm:text-lg font-bold text-blue-400">
+            Đang khởi tạo Proxy Dân Cư Mỹ &amp; Mở màn hình Google độ nét cao...
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-lg">
+            (Vui lòng đợi khoảng 2-3s để hệ thống tự động tiêm sẵn mã ưu đãi 12 Tháng $0.00)
+          </p>
+        </div>
+
+        <!-- VIEW 2A: GOOGLE SIGN IN - EMAIL (00:21 - 00:29 in video) -->
+        <div id="viewLoginEmail" class="hidden flex-1 flex flex-col items-center justify-center bg-[#f0f4f9] p-4 sm:p-8 min-h-[540px]">
+          <div class="bg-white rounded-[28px] p-6 sm:p-10 w-full max-w-[780px] shadow-sm border border-slate-200/80 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+              <!-- Google G Logo SVG -->
+              <svg class="w-10 h-10 mb-4" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+              <h2 class="text-3xl font-normal text-[#1f1f1f]">Sign in</h2>
+              <p class="text-sm text-[#1f1f1f] mt-3 leading-relaxed">
+                with your Google Account. This account will be available to other Google apps in the browser.
+              </p>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <input
+                  id="gEmailInput"
+                  type="email"
+                  value="mongbavuong64@gmail.com"
+                  placeholder="Email or phone"
+                  class="g-input"
+                />
+                <button type="button" id="btnFillDemoEmail" class="text-xs font-medium text-[#0b57d0] hover:underline mt-2 inline-block">
+                  Forgot email?
+                </button>
+              </div>
+              <p class="text-xs text-[#444746] leading-relaxed">
+                Not your computer? Use Guest mode to sign in privately. <span class="text-[#0b57d0] font-medium">Learn more about using Guest mode</span>
+              </p>
+              <div class="flex items-center justify-end gap-4 pt-3">
+                <button type="button" class="text-sm font-medium text-[#0b57d0] hover:bg-blue-50 px-4 py-2 rounded-full">
+                  Create account
+                </button>
+                <button id="btnLoginEmailNext" type="button" class="g-btn-primary">
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 2B: GOOGLE SIGN IN - PASSWORD (00:30 - 00:41 in video) -->
+        <div id="viewLoginPassword" class="hidden flex-1 flex flex-col items-center justify-center bg-[#f0f4f9] p-4 sm:p-8 min-h-[540px]">
+          <div class="bg-white rounded-[28px] p-6 sm:p-10 w-full max-w-[780px] shadow-sm border border-slate-200/80 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+              <svg class="w-10 h-10 mb-4" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+              <h2 class="text-3xl font-normal text-[#1f1f1f]">Welcome</h2>
+              <div class="inline-flex items-center gap-2 mt-3 px-3 py-1 rounded-full border border-slate-300 text-xs font-medium text-[#1f1f1f]">
+                <span class="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">G</span>
+                <span id="displayLoginEmail">mongbavuong64@gmail.com</span>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <input
+                  id="gPasswordInput"
+                  type="password"
+                  value="••••••••••••"
+                  placeholder="Enter your password"
+                  class="g-input"
+                />
+                <label class="flex items-center gap-2 text-xs text-[#1f1f1f] mt-3 cursor-pointer">
+                  <input id="chkShowPass" type="checkbox" class="w-4 h-4 accent-[#0b57d0]" />
+                  <span>Show password</span>
+                </label>
+              </div>
+              <div class="flex items-center justify-end gap-4 pt-4">
+                <button type="button" id="btnBackToEmail" class="text-sm font-medium text-[#0b57d0] hover:bg-blue-50 px-4 py-2 rounded-full">
+                  Forgot password?
+                </button>
+                <button id="btnLoginPassNext" type="button" class="g-btn-primary">
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 2C: SET A HOME ADDRESS / RECOVERY SKIP (00:54 - 01:00 in video) -->
+        <div id="viewLoginSkipHome" class="hidden flex-1 flex flex-col items-center justify-center bg-[#f0f4f9] p-4 sm:p-8 min-h-[540px]">
+          <div class="bg-white rounded-[28px] p-6 sm:p-10 w-full max-w-[780px] shadow-sm border border-slate-200/80 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+              <svg class="w-10 h-10 mb-4" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+              <h2 class="text-2xl sm:text-3xl font-normal text-[#1f1f1f]">Set a home address</h2>
+              <p class="text-xs sm:text-sm text-[#444746] mt-3 leading-relaxed">
+                Your home and work addresses are used to personalize your experiences across Google products, and for ads purposes as described in Google's Privacy Policy.
+              </p>
+            </div>
+            <div class="space-y-4">
+              <input type="text" placeholder="Home address" class="g-input" />
+              <p class="text-xs text-[#444746]">You can change or remove this any time in your Google Account settings.</p>
+              <div class="flex items-center justify-end gap-4 pt-4">
+                <button id="btnSkipHomeAddress" type="button" class="text-sm font-medium text-[#0b57d0] hover:bg-blue-50 px-5 py-2 rounded-full border border-slate-200">
+                  Skip
+                </button>
+                <button id="btnSaveHomeAddress" type="button" class="g-btn-primary">
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 3: GOOGLE ONE PLANS PAGE (one.google.com/plans - 01:02 to 01:52 in video) -->
+        <div id="viewGoogleOnePlans" class="hidden flex-1 flex flex-col bg-white min-h-[540px] relative">
+          <!-- Google One Top Bar -->
+          <div class="flex items-center justify-between px-5 py-3 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="text-lg font-semibold text-[#1f1f1f] tracking-tight"><strong class="text-blue-600">G</strong><strong class="text-red-500">o</strong><strong class="text-amber-500">o</strong><strong class="text-blue-600">g</strong><strong class="text-emerald-600">l</strong><strong class="text-red-500">e</strong> One</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-slate-500 hidden sm:inline" id="plansHeaderEmail">mongbavuong64@gmail.com</span>
+              <div class="w-8 h-8 rounded-full bg-amber-800 text-white font-bold text-sm flex items-center justify-center">G</div>
+            </div>
+          </div>
+
+          <!-- Google One Plans Body -->
+          <div class="max-w-4xl mx-auto w-full px-4 py-6 text-center space-y-4">
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 font-bold text-lg">✦</div>
+            <h2 class="text-2xl sm:text-3xl font-normal text-[#1f1f1f]">Choose the plan that's right for you</h2>
+            <p class="text-xs text-[#444746]">
+              Cancel anytime. By subscribing, you agree to terms for <span class="underline text-blue-600">Google One</span>, <span class="underline text-blue-600">YouTube</span>, and <span class="underline text-blue-600">offers</span>. See how <span class="underline text-blue-600">Google handles data</span>.
+            </p>
+
+            <!-- Monthly / Annual Toggle (Crucial step at 01:28 in video!) -->
+            <div class="pt-1">
+              <div class="inline-flex rounded-full border border-[#747775] p-0.5 bg-white">
+                <button id="btnBillingMonthly" type="button" class="px-5 py-1.5 rounded-full text-xs font-medium text-[#1f1f1f] transition">
+                  Monthly
+                </button>
+                <button id="btnBillingAnnual" type="button" class="px-5 py-1.5 rounded-full text-xs font-medium bg-[#c2e7ff] text-[#001d35] transition">
+                  ✓ Annual
+                </button>
+              </div>
+              <div class="text-[11px] text-[#444746] mt-1 font-medium">Save 16% when you pay annually</div>
+            </div>
+
+            <!-- Plans Grid (Row 1: Storage & Google AI Plus, Row 2: Google AI Pro & Google AI Ultra) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left pt-2">
+              <!-- Card 1: Storage -->
+              <div class="g-plan-card flex flex-col justify-between">
+                <div>
+                  <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-700 mb-2">RECOMMENDED</span>
+                  <h3 class="text-lg font-medium text-[#1f1f1f]">Storage</h3>
+                  <p class="text-xs text-[#444746] mt-0.5">Expanded storage for photos, videos, files, and more</p>
+                  <div class="mt-3">
+                    <span id="priceStorage" class="text-2xl font-normal text-[#1f1f1f]">$16.99<span class="text-xs">/yr</span></span>
+                    <span class="text-xs line-through text-slate-400 ml-1">$19.99</span>
+                    <div class="text-[11px] text-[#444746]">for 1 year, $19.99/yr after</div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 mt-3">
+                    <div class="border border-blue-600 bg-blue-50/50 rounded-lg py-1.5 text-center text-xs font-medium text-blue-700">✓ 100 GB</div>
+                    <div class="border border-slate-300 rounded-lg py-1.5 text-center text-xs font-medium text-slate-600">200 GB</div>
+                  </div>
+                </div>
+                <button type="button" class="btnTriggerDiscount w-full mt-4 g-btn-primary text-center" data-plan="Storage">
+                  Get discount
+                </button>
+              </div>
+
+              <!-- Card 2: Google AI Plus -->
+              <div class="g-plan-card flex flex-col justify-between">
+                <div>
+                  <h3 class="text-lg font-medium text-[#1f1f1f] mt-5">Google AI Plus</h3>
+                  <p class="text-xs text-[#444746] mt-0.5">Get more access to AI tools to boost your productivity and creativity</p>
+                  <div class="mt-3">
+                    <span id="priceAiPlus" class="text-2xl font-normal text-[#1f1f1f]">$37.99<span class="text-xs">/yr</span></span>
+                    <span class="text-xs line-through text-slate-400 ml-1">$49.99</span>
+                    <div class="text-[11px] text-[#444746]">for 1 year, $49.99/yr after</div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 mt-3">
+                    <div class="border border-blue-600 bg-blue-50/50 rounded-lg py-1.5 text-center text-xs font-medium text-blue-700">✓ 400 GB</div>
+                    <div class="border border-slate-300 rounded-lg py-1.5 text-center text-xs font-medium text-slate-600">2 TB</div>
+                  </div>
+                </div>
+                <button type="button" class="btnTriggerDiscount w-full mt-4 g-btn-primary text-center" data-plan="AI Plus">
+                  Get discount
+                </button>
+              </div>
+
+              <!-- Card 3: Google AI Pro (THE TARGET CARD AT 01:38 IN VIDEO) -->
+              <div class="g-plan-card border-2 border-blue-600 ring-4 ring-blue-500/10 flex flex-col justify-between relative">
+                <div class="absolute -top-3 right-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white shadow">
+                  ⚡ ĐÃ TIÊM OFFER $0.00 (12 THÁNG)
+                </div>
+                <div>
+                  <div class="text-blue-600 text-sm font-bold mb-0.5">✦</div>
+                  <h3 class="text-lg font-medium text-[#1f1f1f]">Google AI Pro</h3>
+                  <p class="text-xs text-[#444746] mt-0.5">Work smarter and create faster with expanded benefits across Google</p>
+                  <div class="mt-3">
+                    <span id="priceAiPro" class="text-2xl font-normal text-[#1f1f1f]">$149.99<span class="text-xs">/yr</span></span>
+                    <span class="text-xs line-through text-slate-400 ml-1">$199.99</span>
+                    <div class="text-[11px] text-[#444746]">for 1 year, $199.99/yr after</div>
+                  </div>
+                  <div class="mt-3">
+                    <div class="text-[11px] text-[#444746] mb-1">Choose storage</div>
+                    <div class="border border-blue-600 bg-[#c2e7ff]/40 rounded-lg py-1.5 text-center text-xs font-medium text-[#001d35]">✓ 2 TB / 5 TB (Injected)</div>
+                  </div>
+                </div>
+                <button id="btnGetDiscountAiPro" type="button" class="btnTriggerDiscount w-full mt-4 g-btn-primary text-center font-semibold shadow-md" data-plan="AI Pro">
+                  Get discount
+                </button>
+                <div class="mt-3 pt-3 border-t border-slate-100 text-[11px] text-[#444746] space-y-1">
+                  <div class="font-medium text-[#1f1f1f]">Everything in Plus and more:</div>
+                  <div>✓ Share with up to 5 other people</div>
+                  <div>✓ 2 TB / 5 TB total storage + YouTube Premium Add-On</div>
+                </div>
+              </div>
+
+              <!-- Card 4: Google AI Ultra -->
+              <div class="g-plan-card flex flex-col justify-between">
+                <div>
+                  <div class="text-blue-600 text-sm font-bold mb-0.5">✦</div>
+                  <h3 class="text-lg font-medium text-[#1f1f1f]">Google AI Ultra</h3>
+                  <p class="text-xs text-[#444746] mt-0.5">Accelerate your workflows with highest access to Google AI</p>
+                  <div class="mt-3">
+                    <span class="text-2xl font-normal text-[#1f1f1f]">$99.99<span class="text-xs">/mo</span></span>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 mt-3">
+                    <div class="border border-blue-600 bg-blue-50/50 rounded-lg py-1.5 text-center text-xs font-medium text-blue-700">✓ 5x limits</div>
+                    <div class="border border-slate-300 rounded-lg py-1.5 text-center text-xs font-medium text-slate-600">20x limits</div>
+                  </div>
+                </div>
+                <button type="button" disabled class="w-full mt-4 py-2.5 rounded-full bg-slate-100 text-slate-400 text-xs font-medium cursor-not-allowed">
+                  Monthly billing only
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating Injected Status Badge at Bottom Right (Exact match with inject.js & video 01:02-03:12) -->
+          <div id="injectedFloatingBadge" class="sticky bottom-3 ml-auto mr-3 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#eaf7ea] text-[#1a7f37] border border-[#ccebd9] shadow-lg">
+            <span>⚡ Đã tiêm sẵn Gói 12 Tháng ($0.00 - 12m)</span>
+          </div>
+        </div>
+
+        <!-- OVERLAY MODAL: GOOGLE PLAY PAYMENT & SUBSCRIBE (01:54 - 03:12 in video) -->
+        <div id="googlePlayOverlay" class="hidden absolute inset-0 z-30 bg-black/50 backdrop-blur-[1px] flex flex-col items-center justify-center p-3 sm:p-6">
+          <!-- Play Guard Top Banner (Exact match with play_guard.js & video 02:32) -->
+          <div id="playGuardTopBanner" class="mb-3 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-white bg-slate-800/95 border border-slate-600 shadow-lg flex items-center gap-2">
+            <span id="playGuardText">⏳ Đang tải thông tin từ Google Play, vui lòng chờ...</span>
+          </div>
+
+          <!-- Google Play White Dialog Card -->
+          <div class="bg-white text-[#1f1f1f] rounded-2xl w-full max-w-[460px] shadow-2xl border border-slate-200 overflow-hidden">
+
+            <!-- SUB-STAGE 4A: Choose Payment Method (01:54 in video) -->
+            <div id="playStageMethods" class="p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-[#5f6368]">Google Play</span>
+                <button type="button" id="btnClosePlayModal1" class="text-slate-400 hover:text-slate-700 text-lg leading-none">✕</button>
+              </div>
+              <div>
+                <h3 class="text-lg font-medium text-[#202124]">Add payment method to your Google Account</h3>
+                <p class="text-xs text-[#5f6368] mt-1 leading-relaxed">
+                  Add a payment method to your Google Account to start your free trial. You won't be charged if you cancel before Dec 6, 2026.
+                </p>
+              </div>
+              <div class="divide-y divide-slate-100 border-t border-b border-slate-100">
+                <button id="btnSelectAddCard" type="button" class="w-full py-3 px-2 flex items-center gap-3 hover:bg-slate-50 text-left transition">
+                  <span class="px-2 py-0.5 rounded border border-slate-300 text-xs">💳</span>
+                  <span class="text-sm font-medium text-[#202124]">Add card</span>
+                  <span class="ml-auto text-xs text-blue-600 font-semibold">Khuyên dùng →</span>
+                </button>
+                <button type="button" class="btnSelectOtherMethod w-full py-3 px-2 flex items-center gap-3 hover:bg-slate-50 text-left transition">
+                  <span class="px-2 py-0.5 rounded bg-blue-500 text-white text-[10px] font-bold">V</span>
+                  <span class="text-sm font-medium text-[#202124]">Add Venmo</span>
+                </button>
+                <button type="button" class="btnSelectOtherMethod w-full py-3 px-2 flex items-center gap-3 hover:bg-slate-50 text-left transition">
+                  <span class="px-2 py-0.5 rounded bg-emerald-500 text-white text-[10px] font-bold">$</span>
+                  <span class="text-sm font-medium text-[#202124]">Add Cash App Pay</span>
+                </button>
+                <button type="button" class="btnSelectOtherMethod w-full py-3 px-2 flex items-center gap-3 hover:bg-slate-50 text-left transition">
+                  <span class="px-2 py-0.5 rounded bg-indigo-600 text-white text-[10px] font-bold">P</span>
+                  <span class="text-sm font-medium text-[#202124]">Add PayPal</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- SUB-STAGE 4B: Add Credit or Debit Card Form + ZIP 97201 (02:01 - 02:16 in video) -->
+            <div id="playStageCardForm" class="hidden p-5 space-y-3.5">
+              <div class="flex items-center gap-2">
+                <button type="button" id="btnBackToMethods" class="text-slate-500 hover:text-slate-800 text-sm font-bold">←</button>
+                <h3 class="text-base font-medium text-[#202124]">Add credit or debit card</h3>
+              </div>
+              <p class="text-[11px] text-[#5f6368]">All fields required</p>
+
+              <div class="space-y-2.5">
+                <div>
+                  <label class="text-[11px] text-[#5f6368] block mb-0.5">Card number</label>
+                  <input id="cardNumberInput" type="text" value="4111 •••• •••• 8117" class="w-full border border-slate-300 rounded px-3 py-2 text-sm text-[#202124] focus:border-blue-600 focus:outline-none" />
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label class="text-[11px] text-[#5f6368] block mb-0.5">MM/YY</label>
+                    <input id="cardExpiryInput" type="text" value="08/29" class="w-full border border-slate-300 rounded px-3 py-2 text-sm text-[#202124] focus:border-blue-600 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-[#5f6368] block mb-0.5">Security code (CVV)</label>
+                    <input id="cardCvvInput" type="text" value="842" class="w-full border border-slate-300 rounded px-3 py-2 text-sm text-[#202124] focus:border-blue-600 focus:outline-none" />
+                  </div>
+                </div>
+                <div>
+                  <label class="text-[11px] text-[#5f6368] block mb-0.5">Cardholder name</label>
+                  <input id="cardNameInput" type="text" value="giacmongtrunghoa" class="w-full border border-slate-300 rounded px-3 py-2 text-sm text-[#202124] focus:border-blue-600 focus:outline-none" />
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label class="text-[11px] text-blue-700 font-bold block mb-0.5">Billing zip code (Mỹ)</label>
+                    <input id="cardZipInput" type="text" value="97201" class="w-full border-2 border-blue-600 bg-blue-50/30 rounded px-3 py-2 text-sm font-bold text-[#202124] focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-[#5f6368] block mb-0.5">Country/region</label>
+                    <input type="text" value="United States (US)" readonly class="w-full border border-slate-200 bg-slate-50 rounded px-3 py-2 text-xs text-slate-600" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Injected $0.00 Preview Box (02:12 in video) -->
+              <div class="rounded-xl bg-slate-50 border border-slate-200 p-3 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-bold text-blue-600 text-sm">1</span>
+                  <div class="text-xs font-medium text-[#202124] leading-snug">
+                    Google AI Pro (5 TB) + YouTube Premium Individual Add On
+                  </div>
+                </div>
+                <span class="text-sm font-bold text-emerald-700 shrink-0">$0.00</span>
+              </div>
+
+              <button id="btnSaveCard" type="button" class="w-full py-2.5 rounded-lg bg-[#0b57d0] hover:bg-[#0842a0] text-white text-sm font-medium transition">
+                Save card
+              </button>
+            </div>
+
+            <!-- SUB-STAGE 4C: reCAPTCHA Verification (02:17 - 02:27 in video) -->
+            <div id="playStageCaptcha" class="hidden p-4 space-y-3">
+              <div class="bg-[#1a73e8] text-white p-3.5 rounded-t-lg">
+                <div class="text-xs opacity-90">Select all images with</div>
+                <div class="text-lg font-bold">bridges</div>
+                <div class="text-[11px] opacity-80">Click verify once there are none left.</div>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5">
+                <button type="button" class="captcha-tile relative h-20 rounded bg-gradient-to-br from-sky-700 to-slate-600 flex items-center justify-center text-white text-xs font-semibold ring-2 ring-blue-600">
+                  <span>🌉 Bridge 1</span>
+                  <span class="captcha-check absolute top-1 left-1 w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">✓</span>
+                </button>
+                <button type="button" class="captcha-tile relative h-20 rounded bg-gradient-to-br from-emerald-700 to-teal-800 flex items-center justify-center text-white text-xs font-semibold">
+                  <span>🌲 Forest</span>
+                  <span class="captcha-check hidden absolute top-1 left-1 w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">✓</span>
+                </button>
+                <button type="button" class="captcha-tile relative h-20 rounded bg-gradient-to-br from-slate-600 to-blue-800 flex items-center justify-center text-white text-xs font-semibold ring-2 ring-blue-600">
+                  <span>🌉 Bridge 2</span>
+                  <span class="captcha-check absolute top-1 left-1 w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">✓</span>
+                </button>
+                <button type="button" class="captcha-tile relative h-20 rounded bg-gradient-to-br from-amber-700 to-stone-700 flex items-center justify-center text-white text-xs font-semibold">
+                  <span>🛣️ Highway</span>
+                  <span class="captcha-check hidden absolute top-1 left-1 w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">✓</span>
+                </button>
+                <button type="button" class="captcha-tile relative h-20 rounded bg-gradient-to-br from-indigo-700 to-slate-700 flex items-center justify-center text-white text-xs font-semibold ring-2 ring-blue-600">
+                  <span>🌉 Bridge 3</span>
+                  <span class="captcha-check absolute top-1 left-1 w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">✓</span>
+                </button>
+                <button type="button" class="captcha-tile relative h-20 rounded bg-gradient-to-br from-cyan-700 to-slate-800 flex items-center justify-center text-white text-xs font-semibold">
+                  <span>🏞️ River</span>
+                  <span class="captcha-check hidden absolute top-1 left-1 w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">✓</span>
+                </button>
+              </div>
+              <div class="flex items-center justify-between pt-2 border-t border-slate-200">
+                <span class="text-xs text-slate-400">reCAPTCHA • Xác thực tự động sẵn sàng</span>
+                <button id="btnVerifyCaptcha" type="button" class="px-5 py-2 rounded bg-[#1a73e8] hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider">
+                  VERIFY
+                </button>
+              </div>
+            </div>
+
+            <!-- SUB-STAGE 4D: Final Subscribe $0.00 Confirmation (02:32 - 02:55 in video) -->
+            <div id="playStageSubscribe" class="hidden p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-blue-600 text-sm">1</span>
+                  <div>
+                    <div id="subModalOfferTitle" class="text-xs font-semibold text-[#202124]">Google AI Pro (5 TB) + YouTube Premium Individual Add On</div>
+                    <div class="text-[11px] text-[#5f6368]">Google One</div>
+                  </div>
+                </div>
+                <button type="button" id="btnClosePlayModal2" class="text-slate-400 hover:text-slate-700 text-sm">✕</button>
+              </div>
+
+              <div class="space-y-3 text-xs">
+                <div class="text-sm font-medium text-[#202124]">Upcoming charges</div>
+
+                <!-- Today $0.00 -->
+                <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3 space-y-1">
+                  <div class="flex justify-between font-bold text-[#202124]">
+                    <span>Today</span>
+                    <span class="text-emerald-700 text-sm">$0.00</span>
+                  </div>
+                  <div class="flex justify-between text-[11px] text-[#5f6368]">
+                    <span id="subModalTrialLabel">Google AI Pro (5 TB) - 12-month free trial</span>
+                    <span>$0.00</span>
+                  </div>
+                  <div class="flex justify-between text-[11px] text-[#5f6368]">
+                    <span>YouTube Premium Individual Add On - 1-month free trial</span>
+                    <span>$0.00</span>
+                  </div>
+                </div>
+
+                <!-- Future dates -->
+                <div class="space-y-1 text-[11px] text-[#5f6368] px-1">
+                  <div class="flex justify-between font-medium text-[#202124]">
+                    <span>Starting Dec 6, 2026</span>
+                    <span>$11.99/month</span>
+                  </div>
+                  <div>Includes tax of $0.00 • YouTube Premium Individual Add On ($11.99)</div>
+                </div>
+
+                <div class="space-y-1 text-[11px] text-[#5f6368] px-1">
+                  <div class="flex justify-between font-medium text-[#202124]">
+                    <span>Starting Nov 6, 2027</span>
+                    <span>$31.98/month</span>
+                  </div>
+                  <div>Google AI Pro (5 TB) $19.99 + YouTube Premium Individual Add On $11.99</div>
+                </div>
+
+                <!-- Subscribing on Play notes -->
+                <div class="border-t border-slate-100 pt-2.5 space-y-1 text-[11px] text-[#5f6368]">
+                  <div class="font-medium text-[#202124]">Subscribing on Play</div>
+                  <div>• Cancel anytime in Subscriptions on Google Play</div>
+                  <div>• You won't be charged if you cancel before Dec 6, 2026</div>
+                </div>
+
+                <!-- Payment card selected -->
+                <div class="flex items-center justify-between py-2 px-3 rounded-lg bg-slate-50 border border-slate-200">
+                  <div class="flex items-center gap-2">
+                    <span class="px-1.5 py-0.5 rounded bg-blue-900 text-white text-[10px] font-bold">VISA</span>
+                    <span class="font-medium text-[#202124]">Visa-8117</span>
+                  </div>
+                  <span class="text-slate-400">›</span>
+                </div>
+              </div>
+
+              <button id="btnConfirmSubscribe" type="button" class="w-full py-2.5 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] text-white text-sm font-semibold shadow-lg transition">
+                Subscribe
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5. EXTENSION & VERCEL ARCHITECTURE HUB (Shows the injected tokens, userscript, and Vercel API status) -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2">
+      <!-- Card A: Extension Token Status -->
+      <div class="rounded-2xl border border-slate-800/90 bg-[#0d1527] p-4 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+            <span>🧩 Core Tiện Ích Đã Tích Hợp (`inject.js`)</span>
+          </h3>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-500/30">MAIN WORLD</span>
+        </div>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Tự động can thiệp request <code class="text-slate-200">Ngbm</code> (XHR) và tham số <code class="text-slate-200">/eacquire/multiline?ear=</code> trên <code class="text-slate-200">one.google.com/plans</code> để tiêm mã ưu đãi:
+        </p>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-[11px] font-mono text-slate-300 space-y-1">
+          <div><span class="text-blue-400">Gói chính:</span> g1.2tb.ai.subs_variant</div>
+          <div><span class="text-emerald-400">Add-on:</span> g1.youtube_premium_individual_add_on</div>
+          <div class="truncate"><span class="text-amber-400">Token đang chọn:</span> <span id="activeTokenPreview">AVbCH/cspB8VdqKJ+ax/uPxUFAVuYRPX4iSjtg4Fu0PG9zUeURSM7y//LlQva1dCd/rbKVM6EJmyiG/C9BoQ95pMl8yDCHuiwCvM5CuGJME=</span></div>
+        </div>
+        <div class="flex items-center gap-2 pt-1">
+          <button id="btnCopyUserscript" type="button" class="flex-1 py-2 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold transition">
+            📋 Copy Script Chạy Console / Tampermonkey
+          </button>
+        </div>
+      </div>
+
+      <!-- Card B: Play Guard Price Verification -->
+      <div class="rounded-2xl border border-slate-800/90 bg-[#0d1527] p-4 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+            <span>🛡️ Bộ Kiểm Tra Giá (`play_guard.js`)</span>
+          </h3>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-950 text-blue-300 border border-blue-500/30">IFRAME GUARD</span>
+        </div>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Tự động quét nội dung cửa sổ thanh toán <code class="text-slate-200">tokenized.play.google.com</code> để xác nhận từ khóa miễn phí (<code class="text-emerald-300">free trial, $0.00, won't be charged</code>) trước khi bấm Subscribe.
+        </p>
+        <div class="rounded-xl bg-emerald-950/50 border border-emerald-500/30 p-2.5 text-xs text-emerald-300 font-medium">
+          ✅ Bảo vệ kép: Chỉ trừ lượt mã CDK khi Google Play trả về xác nhận giao dịch $0.00 thành công (Bước 5/5).
+        </div>
+        <button id="btnOpenExtModal2" type="button" class="w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition">
+          ⚙️ Mở Bảng Điều Khiển Tiện Ích 2 Năm
+        </button>
+      </div>
+
+      <!-- Card C: Vercel Ready Info -->
+      <div class="rounded-2xl border border-slate-800/90 bg-[#0d1527] p-4 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+            <span>🚀 Sẵn Sàng Đẩy Lên Vercel</span>
+          </h3>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-950 text-purple-300 border border-purple-500/30">ZERO-CONFIG</span>
+        </div>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Dự án đóng gói sẵn cấu hình <code class="text-slate-200">vercel.json</code>, Serverless API (<code class="text-slate-200">/api/cdk</code>, <code class="text-slate-200">/api/session</code>), Remote Browser Worker và thư mục Chrome Extension.
+        </p>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-[11px] font-mono text-slate-300">
+          <div>1. Tải gói ZIP dự án bên cạnh</div>
+          <div>2. Đẩy lên GitHub hoặc chạy <span class="text-emerald-400">vercel --prod</span></div>
+        </div>
+        <button id="btnOpenPostCheck2" type="button" class="w-full py-2 px-3 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition">
+          🔎 Xem Màn Hình Check Gói &amp; Hủy Gia Hạn (03:18)
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 1: EXACT REPLICA OF UPLOADED EXTENSION POPUP (image_b5afbd.png)     -->
+  <!-- ========================================================================= -->
+  <div id="extPopupModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="relative w-full max-w-[390px] rounded-2xl overflow-hidden shadow-2xl border border-slate-300 ext-popup-bg p-5">
+      <button id="btnCloseExtModal" type="button" class="absolute top-3.5 right-3.5 w-7 h-7 rounded-full bg-slate-200/80 hover:bg-slate-300 text-slate-700 font-bold text-xs flex items-center justify-center">
+        ✕
+      </button>
+
+      <h2 class="text-[17px] font-bold text-[#1d2c47] tracking-tight">Google AI Pro 2 năm · Tiện ích</h2>
+      <p class="text-[11px] text-[#69778d] mt-1 mb-4">
+        Đăng nhập tài khoản cần dùng (khu vực Hoa Kỳ) trên trình duyệt, sau đó chọn tùy chọn
+      </p>
+
+      <!-- Radio Option Box matching image_b5afbd.png -->
+      <div class="bg-white border border-[#e2e8f2] rounded-[14px] p-3 mb-3 shadow-sm">
+        <div class="text-[11px] text-[#69778d] mb-2.5 px-0.5">
+          Chế độ áp dụng (tự động lưu khi chọn; hãy tải lại trang)
+        </div>
+
+        <div id="extRadioGroup" class="space-y-1 text-[13px]">
+          <label class="ext-row" data-layer="off">
+            <input type="radio" name="ext_layer" value="off" class="w-4 h-4 accent-[#416fdb]" />
+            <span class="flex-1">Tắt tính năng</span>
+          </label>
+          <label class="ext-row checked" data-layer="12m">
+            <input type="radio" name="ext_layer" value="12m" checked class="w-4 h-4 accent-[#416fdb]" />
+            <span class="flex-1">Lựa chọn 1 · 12 tháng</span>
+            <span class="ext-tag">Lần đầu</span>
+          </label>
+          <label class="ext-row" data-layer="6m_ss">
+            <input type="radio" name="ext_layer" value="6m_ss" class="w-4 h-4 accent-[#416fdb]" />
+            <span class="flex-1">Lựa chọn 2 · 6 tháng (SS)</span>
+            <span class="ext-tag">Tiếp theo</span>
+          </label>
+          <label class="ext-row" data-layer="6m">
+            <input type="radio" name="ext_layer" value="6m" class="w-4 h-4 accent-[#416fdb]" />
+            <span class="flex-1">Lựa chọn 3 · 6 tháng</span>
+            <span class="ext-tag">Tiếp theo</span>
+          </label>
+          <label class="ext-row" data-layer="6m_2">
+            <input type="radio" name="ext_layer" value="6m_2" class="w-4 h-4 accent-[#416fdb]" />
+            <span class="flex-1">Dự phòng · 6 tháng</span>
+            <span class="ext-tag">Dự phòng</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Dynamic State Box -->
+      <div id="extPopupStateBox" class="text-[11.5px] px-3 py-2.5 rounded-[10px] bg-[#edf9f2] border border-[#ccebd9] text-[#24744c] font-medium">
+        Đã kích hoạt: 12 tháng — Có thể kiểm tra mục Get discount
+      </div>
+
+      <!-- Numbered Instructions matching popup.html -->
+      <ol class="mt-3.5 pl-5 text-[11.5px] text-[#647187] space-y-1.5 list-decimal">
+        <li>Mở <strong class="text-[#3d4d66]">one.google.com/plans</strong> và kiểm tra email tài khoản ở góc trên bên trái</li>
+        <li>Chọn một chế độ ở trên → tải lại trang → xem trạng thái ở góc dưới bên phải</li>
+        <li>Nhấn <strong class="text-[#3d4d66]">Get discount (Nhận ưu đãi)</strong> trên thẻ AI Pro để mở cửa sổ thanh toán Google Play</li>
+        <li>Đọc kỹ điều khoản trong cửa sổ thanh toán; <strong class="text-[#3d4d66]">màu xanh = phát hiện dấu hiệu dùng thử</strong>, màu đỏ = có dấu hiệu tính phí</li>
+        <li>Kiểm tra phương thức thanh toán, số tiền và các điều khoản trước khi xác nhận đăng ký</li>
+        <li>Để chuyển lựa chọn: quay lại tiện ích → chọn chế độ khác → tải lại trang</li>
+        <li>Nếu không muốn tự động gia hạn, hãy kiểm tra mục gói thuê bao trên play.google.com</li>
+      </ol>
+
+      <div class="mt-3.5 pt-2.5 border-t border-[#e2e8f0] text-[10.5px] text-[#7c899e] flex items-center justify-between">
+        <span>Tiện ích cá nhân (Đồng bộ trực tiếp với Web CDK)</span>
+        <button id="btnCopyBookmarklet" type="button" class="text-[#2457bd] font-semibold hover:underline">
+          Copy Script Tiêm Nhanh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 2: POST-ACTIVATION CHECK & CANCEL SUBSCRIPTION (Video 03:18 - 04:02)-->
+  <!-- ========================================================================= -->
+  <div id="postCheckModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-white text-[#1f1f1f] w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-300 overflow-hidden flex flex-col max-h-[90vh]">
+      <!-- Modal Header Tabs -->
+      <div class="bg-slate-900 text-white px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <button id="tabCheckOne" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white">
+            1. Kiểm tra Gói Google One (03:20)
+          </button>
+          <button id="tabCancelPlay" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300">
+            2. Hủy Gia Hạn Trên Google Play (03:45)
+          </button>
+        </div>
+        <button id="btnClosePostCheck" type="button" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">
+          ✕ Đóng
+        </button>
+      </div>
+
+      <!-- Tab 1 Content: Nâng cấp gói Google One của bạn (03:20 in video) -->
+      <div id="contentCheckOne" class="p-6 overflow-y-auto space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <span class="text-lg font-medium"><strong class="text-blue-600">G</strong><strong class="text-red-500">o</strong><strong class="text-amber-500">o</strong><strong class="text-blue-600">g</strong><strong class="text-emerald-600">l</strong><strong class="text-red-500">e</strong> One</span>
+          <span class="text-xs text-slate-500">one.google.com/plans</span>
+        </div>
+
+        <h3 class="text-2xl font-normal text-center text-[#1f1f1f]">Nâng cấp gói Google One của bạn</h3>
+
+        <div class="max-w-lg mx-auto border-2 border-blue-600 rounded-2xl p-5 shadow-sm space-y-3 bg-white">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">GÓI HIỆN TẠI</div>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            ✓ Dùng thử 12 tháng
+          </span>
+          <div class="flex items-baseline justify-between">
+            <div>
+              <div class="text-base font-bold text-[#1f1f1f]">Google AI Pro (5 TB)</div>
+              <div class="text-xs text-[#5f6368]">Chia sẻ bộ nhớ với tối đa 5 người khác</div>
+            </div>
+            <div class="text-sm font-bold text-emerald-700">0 US$ / tháng</div>
+          </div>
+          <div class="text-xs text-[#1f1f1f] bg-blue-50/60 px-3 py-2 rounded-lg">
+            <span class="line-through text-slate-400">19,99 US$</span> <strong>0 US$/tháng trong 12 tháng</strong>, sau đó là 19,99 US$/tháng
+          </div>
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-[#5f6368]">
+            <span>YouTube Premium cá nhân (Dùng thử 1 tháng)</span>
+            <span>0 US$ / tháng</span>
+          </div>
+          <div class="pt-2 flex justify-end">
+            <button id="btnGoToCancelTab" type="button" class="px-4 py-2 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-50 text-xs font-semibold">
+              Quản lý tiện ích bổ sung / Hủy gia hạn →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2 Content: Google Play Subscriptions Cancel Flow (03:45 - 03:57 in video) -->
+      <div id="contentCancelPlay" class="hidden p-6 overflow-y-auto space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold text-[#202124]">▶ Google Play</span>
+            <span class="text-xs text-slate-400">• Thanh toán và gói thuê bao</span>
+          </div>
+          <span class="text-xs text-slate-500">play.google.com/store/account/subscriptions</span>
+        </div>
+
+        <div class="max-w-xl mx-auto border border-slate-200 rounded-2xl p-5 space-y-4 bg-white shadow-sm">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-blue-600 text-lg">1</div>
+              <div>
+                <h4 class="text-base font-medium text-[#202124]">Google One</h4>
+                <p class="text-xs text-[#5f6368]">Google AI Pro (5 TB) + YouTube Premium Individual Add On</p>
+                <p id="subCancelStatusLine" class="text-xs text-slate-600 mt-1">
+                  Kỳ thanh toán tiếp theo: 11,99 US$ vào ngày 6 thg 12, 2026
+                </p>
+              </div>
+            </div>
+            <span id="subStatusPill" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
+              Đang hoạt động
+            </span>
+          </div>
+
+          <div class="border-t border-slate-100 pt-3 text-xs text-[#5f6368] space-y-1">
+            <div><strong>Phương thức thanh toán chính:</strong> Visa-8117</div>
+            <div><strong>Lưu ý:</strong> Sau khi hủy gia hạn tự động, bạn vẫn được sử dụng trọn vẹn 12 tháng Google AI Pro miễn phí cho đến ngày hết hạn.</div>
+          </div>
+
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <button id="btnTriggerCancelSub" type="button" class="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-semibold transition">
+              Hủy gói thuê bao (Giữ nguyên 12 tháng Free)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 3: ADMIN CDK MANAGER (Create/Reset CDK codes)                       -->
+  <!-- ========================================================================= -->
+  <div id="adminCdkModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0d1527] border border-slate-700 text-slate-100 w-full max-w-lg rounded-2xl shadow-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+          <span>🔑 Quản Lý &amp; Tạo Mã Kích Hoạt (CDK Admin)</span>
+        </h3>
+        <button id="btnCloseAdminModal" type="button" class="text-slate-400 hover:text-white text-sm font-bold">✕</button>
+      </div>
+
+      <div class="flex gap-2">
+        <input id="newCdkCodeInput" type="text" placeholder="Nhập mã CDK mới (VD: VIP-12M-8888)" class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase" />
+        <input id="newCdkUsesInput" type="number" value="1" min="1" max="100" class="w-20 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white text-center" />
+        <button id="btnAddCdkCode" type="button" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold">
+          + Tạo Mã
+        </button>
+      </div>
+
+      <div id="cdkTableContainer" class="max-h-60 overflow-y-auto divide-y divide-slate-800 border border-slate-800 rounded-xl bg-slate-950/60">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastNotification" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-slate-900/95 border border-blue-500/50 text-white text-xs font-semibold shadow-2xl">
+    Đã sao chép!
+  </div>
+
+  <!-- APPLICATION LOGIC -->
+  <script>
+    (function () {
+      // Exact Offer Tokens from google_pro_tieng_viet/inject.js
+      const PREFIX = "subs:com.google.android.apps.subscriptions.red:";
+      const TOKENS = {
+        "12m": "AVbCH/cspB8VdqKJ+ax/uPxUFAVuYRPX4iSjtg4Fu0PG9zUeURSM7y//LlQva1dCd/rbKVM6EJmyiG/C9BoQ95pMl8yDCHuiwCvM5CuGJME=",
+        "6m_ss": "AVbCH/cgl4zvPT2Lqw95Gn+RYAJIVwFwi783i6uVprX7u3MCa5J4CcTXH5RABa5WjBrUoQnwf8vI10TNV7ktd26myIdxqIwGmNoJ5ofYNqpQ10RKoSvHs75wsfA=",
+        "6m": "AVbCH/fUON3w8hpfeutprA3BMQwrBwYIB6Y8CSWi1isDCDswKUUhGQ3dluj5WXsNKOvr8K5UULBGrRsf4KlW1rHLz0fF3SvxQhBFRbBOHCA=",
+        "6m_2": "AVbCH/cJ5SeHgkVRt+bdcrapx/aLSu2kbsBgMdI413zbllDNsNQoC/zVlG/Npbu55WlMzBwWPhUedIvZFDg7fw0CmCv/8DKj04IZ21pK7mrV/hh5"
+      };
+      const YT_FREE_TOK = "AVbCH/eW4Nfp8KBl0zlm7x9PhaiCvpnqwUuL2D8NFPBQgmM9+HuYS1h2xH5lLWU/BsBj775LK5GqK8UHKqoSzhDDz+PqP3paNesqLU0r9i6XCrYa";
+      const LAYER_LABELS = {
+        "off": "Chưa bật",
+        "12m": "12 tháng",
+        "6m_ss": "6 tháng (SS)",
+        "6m": "6 tháng",
+        "6m_2": "6 tháng (dự phòng)"
+      };
+
+      // In-memory + localStorage CDK Database
+      const defaultCdks = {
+        "VIP-12M-0003": { code: "VIP-12M-0003", remaining: 1, totalUsed: 0 },
+        "VIP-12M-0001": { code: "VIP-12M-0001", remaining: 1, totalUsed: 0 },
+        "VIP-12M-0002": { code: "VIP-12M-0002", remaining: 2, totalUsed: 0 },
+        "VIP-2Y-9999": { code: "VIP-2Y-9999", remaining: 5, totalUsed: 0 }
+      };
+
+      let cdkStore = Object.assign({}, defaultCdks);
+      try {
+        const saved = localStorage.getItem("gapt_cdk_store_v1");
+        if (saved) cdkStore = Object.assign({}, defaultCdks, JSON.parse(saved));
+      } catch (e) {}
+
+      function saveCdkStore() {
+        try {
+          localStorage.setItem("gapt_cdk_store_v1", JSON.stringify(cdkStore));
+        } catch (e) {}
+      }
+
+      let currentLayer = "12m";
+      let sessionActive = false;
+      let currentFocusedInputId = "gEmailInput";
+      let activeTimers = [];
+
+      function clearAllTimers() {
+        activeTimers.forEach((id) => clearTimeout(id));
+        activeTimers = [];
+      }
+
+      function showToast(msg) {
+        const t = document.getElementById("toastNotification");
+        t.textContent = msg;
+        t.classList.remove("hidden");
+        setTimeout(() => t.classList.add("hidden"), 2600);
+      }
+
+      // Sync UI for current CDK code
+      function getNormalizedCdk() {
+        const raw = (document.getElementById("cdkInput").value || "").trim().toUpperCase();
+        return raw || "VIP-12M-0003";
+      }
+
+      function updateCdkBadges(statusMode) {
+        const code = getNormalizedCdk();
+        const record = cdkStore[code];
+        const remBadge = document.getElementById("cdkRemainingBadge");
+        const alertBox = document.getElementById("cdkAlertBox");
+        const alertIcon = document.getElementById("cdkAlertIcon");
+        const alertText = document.getElementById("cdkAlertText");
+        const heroPillState = document.getElementById("heroPillState");
+        const heroPillCdkInfo = document.getElementById("heroPillCdkInfo");
+        const heroTitle = document.getElementById("heroTitle");
+        const heroSubtitle = document.getElementById("heroSubtitle");
+
+        if (!record) {
+          remBadge.className = "px-2.5 py-1 rounded-md font-bold bg-red-950 text-red-400 border border-red-500/40";
+          remBadge.textContent = "Mã không tồn tại";
+          alertBox.className = "rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 bg-red-950/60 border border-red-500/40 text-red-300";
+          alertIcon.textContent = "❌";
+          alertText.textContent = 'Mã "' + code + '" không tồn tại trong hệ thống. Hãy bấm "+ Nạp lại 1 lượt (Test)" hoặc mở Quản lý CDK.';
+          return;
+        }
+
+        if (record.remaining > 0) {
+          remBadge.className = "px-2.5 py-1 rounded-md font-bold bg-emerald-950 text-emerald-400 border border-emerald-500/40";
+          remBadge.textContent = record.remaining + " lần kích hoạt (Chưa trừ)";
+        } else {
+          remBadge.className = "px-2.5 py-1 rounded-md font-bold bg-red-950 text-red-400 border border-red-500/40";
+          remBadge.textContent = "0 lần kích hoạt (Đã dùng hết)";
+        }
+
+        if (statusMode === "running") {
+          alertBox.className = "rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 bg-amber-950/60 border border-amber-500/40 text-amber-300";
+          alertIcon.textContent = "⏳";
+          alertText.textContent = "Đang chạy quy trình với mã " + code + " (Chưa trừ lượt — Thành công mới trừ)";
+
+          heroPillState.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/40";
+          heroPillState.textContent = "● ĐANG CHẠY PHIÊN TRỰC TIẾP";
+          heroPillCdkInfo.className = "px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-950/90 text-emerald-300 border border-emerald-500/40";
+          heroPillCdkInfo.textContent = "⚡ MÃ " + code + ": CHƯA TRỪ LƯỢT (CÒN " + record.remaining + " LẦN KÍCH HOẠT)";
+          heroTitle.textContent = "Hệ thống sẽ tự động tiêm mã ưu đãi Gói " + (LAYER_LABELS[currentLayer] || "12 Tháng") + " ($0.00)";
+          heroSubtitle.textContent = "Hãy đăng nhập Google, chọn gói Annual (Hàng năm) và nhấn nút Get discount / Subscribe trực tiếp trên màn hình bên dưới!";
+        } else if (statusMode === "completed") {
+          alertBox.className = "rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 bg-red-950/60 border border-red-500/40 text-red-300";
+          alertIcon.textContent = "⛔";
+          alertText.textContent = "Mã " + code + ": ĐÃ KÍCH HOẠT THÀNH CÔNG (Đã trừ 1 lượt — Còn " + record.remaining + " lượt)";
+
+          heroPillState.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+          heroPillState.textContent = "● HOÀN TẤT (ĐÃ TRỪ 1 LẦN KÍCH HOẠT)";
+          heroPillCdkInfo.className = "px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-950/90 text-emerald-300 border border-emerald-500/40";
+          heroPillCdkInfo.textContent = "⚡ ĐÃ KÍCH HOẠT THÀNH CÔNG (ĐÃ TRỪ 1 LƯỢT -> CÒN " + record.remaining + " LƯỢT)";
+          heroTitle.textContent = "Bước 5/5: KÍCH HOẠT THÀNH CÔNG GÓI 12 THÁNG! (Đã trừ 1 lượt mã " + code + ")";
+          heroSubtitle.textContent = "Chúc mừng! Tài khoản Google của bạn đã nâng cấp thành công gói Google AI Pro 12 Tháng ($0.00), hệ thống đã tự động đóng phiên.";
+        } else if (statusMode === "stopped") {
+          alertBox.className = "rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300";
+          alertIcon.textContent = "✅";
+          alertText.textContent = 'Mã "' + code + '" hợp lệ — Số lượt còn lại: ' + record.remaining + " lần kích hoạt (Thất bại không trừ, thành công mới trừ)";
+
+          heroPillState.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+          heroPillState.textContent = "● SẴN SÀNG";
+          heroPillCdkInfo.className = "px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-950/90 text-emerald-300 border border-emerald-500/40";
+          heroPillCdkInfo.textContent = "⚡ MÃ " + code + ": CHƯA TRỪ LƯỢT (VẪN CÒN " + record.remaining + " LẦN KÍCH HOẠT)";
+          heroTitle.textContent = "Đã đóng cửa sổ kích hoạt — Mã " + code + " KHÔNG bị trừ lượt!";
+          heroSubtitle.textContent = "Mã " + code + " vẫn còn nguyên " + record.remaining + " lần kích hoạt. Bạn có thể bấm Bắt Đầu để dùng lại bất cứ lúc nào!";
+        } else {
+          // Default check
+          if (record.remaining > 0) {
+            alertBox.className = "rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300";
+            alertIcon.textContent = "✅";
+            alertText.textContent = 'Mã "' + code + '" hợp lệ — Số lượt còn lại: ' + record.remaining + " lần kích hoạt (Thất bại không trừ, thành công mới trừ)";
+          } else {
+            alertBox.className = "rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 bg-red-950/60 border border-red-500/40 text-red-300";
+            alertIcon.textContent = "⛔";
+            alertText.textContent = "Mã " + code + ": ĐÃ KÍCH HOẠT THÀNH CÔNG (Đã trừ 1 lượt — Còn 0 lượt)";
+          }
+        }
+      }
+
+      // Update 5-Step Progress Tracker UI
+      function setStepProgress(stepNum, completedAll) {
+        for (let i = 1; i <= 5; i++) {
+          const card = document.getElementById("stepCard" + i);
+          card.classList.remove("active", "done");
+          if (completedAll || i < stepNum) {
+            card.classList.add("done");
+          } else if (i === stepNum) {
+            card.classList.add("active");
+          }
+        }
+        const t5 = document.getElementById("stepTitle5");
+        const s5 = document.getElementById("stepSub5");
+        if (completedAll) {
+          t5.innerHTML = '<span class="text-emerald-400">✓ Thành Công!</span>';
+          s5.textContent = "Đã trừ 1 lượt CDK";
+        } else {
+          t5.innerHTML = "<span>⏳ Hoàn tất 12M</span>";
+          s5.textContent = "Lỗi bảo nguyên mã";
+        }
+      }
+
+      // Switch inner screen inside the live Google viewport
+      function showBrowserScreen(screenName) {
+        const views = ["viewProxyInit", "viewLoginEmail", "viewLoginPassword", "viewLoginSkipHome", "viewGoogleOnePlans"];
+        views.forEach((v) => document.getElementById(v).classList.add("hidden"));
+        document.getElementById("googlePlayOverlay").classList.add("hidden");
+
+        const viewportBanner = document.getElementById("viewportStepBanner");
+        const processStatusText = document.getElementById("processStatusText");
+        const label = LAYER_LABELS[currentLayer] || "12 Tháng";
+
+        if (screenName === "proxy-init") {
+          document.getElementById("viewProxyInit").classList.remove("hidden");
+          setStepProgress(1, false);
+          viewportBanner.innerHTML = "<span>🖥️ Màn Hình Google Trực Tiếp (Đổi mã - Mã ZIP Mỹ: 97201)</span>";
+          processStatusText.textContent = "⏳ Bước 1/5: Đang xoay Proxy Dân Cư Mỹ & khởi tạo trình duyệt sạch...";
+        } else if (screenName === "login-email") {
+          document.getElementById("viewLoginEmail").classList.remove("hidden");
+          currentFocusedInputId = "gEmailInput";
+          setStepProgress(2, false);
+          viewportBanner.innerHTML = "<span>🔑 Bước 2/5: Hãy Tự Đăng Nhập Tài Khoản Google ngay bên dưới</span>";
+          processStatusText.textContent = "🔑 Bước 2/5: Đang mở màn hình Google trực tiếp — Hãy tự đăng nhập, bấm nhận gói 12M, nhập thẻ (ZIP 97201) và nhấn Subscribe!";
+        } else if (screenName === "login-password") {
+          document.getElementById("viewLoginPassword").classList.remove("hidden");
+          document.getElementById("displayLoginEmail").textContent = document.getElementById("gEmailInput").value || "mongbavuong64@gmail.com";
+          currentFocusedInputId = "gPasswordInput";
+          setStepProgress(2, false);
+          viewportBanner.innerHTML = "<span>🔑 Bước 2/5: Hãy nhập Mật khẩu tài khoản Google của bạn</span>";
+        } else if (screenName === "login-skip-home") {
+          document.getElementById("viewLoginSkipHome").classList.remove("hidden");
+          setStepProgress(2, false);
+          viewportBanner.innerHTML = "<span>🔑 Bước 2/5: Bấm Skip (Bỏ qua) địa chỉ nhà để vào trang Gói ưu đãi Google One</span>";
+        } else if (screenName === "plans") {
+          document.getElementById("viewGoogleOnePlans").classList.remove("hidden");
+          document.getElementById("plansHeaderEmail").textContent = document.getElementById("gEmailInput").value || "mongbavuong64@gmail.com";
+          setStepProgress(3, false);
+          viewportBanner.innerHTML = "<span>⚡ Bước 3/5: Đã tiêm Offer " + label + " ($0.00) — Hãy bấm nhận gói trực tiếp trên màn hình!</span>";
+          processStatusText.textContent = "⚡ Bước 3/5: Đã tiêm Offer " + label + " ($0.00) — Hãy chọn gói Annual và bấm Get discount trên thẻ Google AI Pro!";
+          document.getElementById("injectedFloatingBadge").innerHTML = "<span>⚡ Đã tiêm sẵn Gói " + label + " ($0.00 - " + currentLayer + ")</span>";
+        } else if (screenName === "play-methods") {
+          document.getElementById("viewGoogleOnePlans").classList.remove("hidden");
+          document.getElementById("googlePlayOverlay").classList.remove("hidden");
+          document.getElementById("playStageMethods").classList.remove("hidden");
+          document.getElementById("playStageCardForm").classList.add("hidden");
+          document.getElementById("playStageCaptcha").classList.add("hidden");
+          document.getElementById("playStageSubscribe").classList.add("hidden");
+          setStepProgress(4, false);
+          viewportBanner.innerHTML = "<span>💳 Bước 4/5: Hãy tự nhập Thẻ (ZIP Mỹ: 97201) &amp; nhấn Subscribe ($0.00) trên màn hình!</span>";
+          processStatusText.textContent = "💳 Bước 4/5: Đã mở cửa sổ Google Play — Hãy chọn Add card, nhập thông tin thẻ Visa/Mastercard và mã ZIP 97201.";
+          document.getElementById("injectedFloatingBadge").innerHTML = "<span>⚡ Đã tiêm sẵn Gói " + label + " ($0.00 - " + currentLayer + ") | Đã kích hoạt: 1</span>";
+          const pgBanner = document.getElementById("playGuardTopBanner");
+          pgBanner.className = "mb-3 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-white bg-slate-800/95 border border-slate-600 shadow-lg flex items-center gap-2";
+          document.getElementById("playGuardText").textContent = "⏳ Đang tải thông tin từ Google Play, vui lòng chờ...";
+        } else if (screenName === "play-card") {
+          document.getElementById("viewGoogleOnePlans").classList.remove("hidden");
+          document.getElementById("googlePlayOverlay").classList.remove("hidden");
+          document.getElementById("playStageMethods").classList.add("hidden");
+          document.getElementById("playStageCardForm").classList.remove("hidden");
+          document.getElementById("playStageCaptcha").classList.add("hidden");
+          document.getElementById("playStageSubscribe").classList.add("hidden");
+          currentFocusedInputId = "cardNumberInput";
+          setStepProgress(4, false);
+          viewportBanner.innerHTML = "<span>💳 Bước 4/5: Hãy tự nhập Thẻ (ZIP Mỹ: 97201) &amp; nhấn Save card!</span>";
+        } else if (screenName === "play-captcha") {
+          document.getElementById("viewGoogleOnePlans").classList.remove("hidden");
+          document.getElementById("googlePlayOverlay").classList.remove("hidden");
+          document.getElementById("playStageMethods").classList.add("hidden");
+          document.getElementById("playStageCardForm").classList.add("hidden");
+          document.getElementById("playStageCaptcha").classList.remove("hidden");
+          document.getElementById("playStageSubscribe").classList.add("hidden");
+          setStepProgress(4, false);
+          viewportBanner.innerHTML = "<span>🤖 Bước 4/5: Xác nhận reCAPTCHA để lưu thẻ vào Google Play</span>";
+        } else if (screenName === "play-subscribe") {
+          document.getElementById("viewGoogleOnePlans").classList.remove("hidden");
+          document.getElementById("googlePlayOverlay").classList.remove("hidden");
+          document.getElementById("playStageMethods").classList.add("hidden");
+          document.getElementById("playStageCardForm").classList.add("hidden");
+          document.getElementById("playStageCaptcha").classList.add("hidden");
+          document.getElementById("playStageSubscribe").classList.remove("hidden");
+          setStepProgress(4, false);
+          // Activate play_guard.js green bar!
+          const pgBanner = document.getElementById("playGuardTopBanner");
+          pgBanner.className = "mb-3 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold text-white bg-[#1a7f37] border border-emerald-400 shadow-lg flex items-center gap-2";
+          document.getElementById("playGuardText").textContent = '✅ GÓI HỢP LỆ ($0.00): Đã xác nhận Gói ' + label + ' — Hãy nhấn nút "Subscribe" để thanh toán!';
+          viewportBanner.innerHTML = '<span>✅ GÓI HỢP LỆ ($0.00): Đã xác nhận Gói ' + label + ' — Hãy nhấn nút "Subscribe" để thanh toán!</span>';
+          processStatusText.textContent = '✅ Phát hiện điều khoản dùng thử miễn phí ($0.00) — Hãy nhấn nút "Subscribe" để hoàn tất!';
+        }
+      }
+
+      // Start Activation Flow
+      document.getElementById("btnStartActivation").addEventListener("click", function () {
+        clearAllTimers();
+        const code = getNormalizedCdk();
+        const record = cdkStore[code];
+        if (!record) {
+          updateCdkBadges("check");
+          showToast("Mã CDK không tồn tại! Hãy kiểm tra lại.");
+          return;
+        }
+        if (record.remaining <= 0) {
+          updateCdkBadges("check");
+          showToast('Mã "' + code + '" đã hết lượt! Bấm "+ Nạp lại 1 lượt (Test)" để thử lại.');
+          return;
+        }
+
+        sessionActive = true;
+        document.getElementById("btnStopSession").classList.remove("hidden");
+        document.getElementById("liveViewportSection").classList.remove("hidden");
+        updateCdkBadges("running");
+        showBrowserScreen("proxy-init");
+
+        const t1 = setTimeout(() => {
+          showBrowserScreen("login-email");
+        }, 1400);
+        activeTimers.push(t1);
+      });
+
+      // Stop / Reset Session without deducting CDK
+      document.getElementById("btnStopSession").addEventListener("click", function () {
+        clearAllTimers();
+        sessionActive = false;
+        document.getElementById("btnStopSession").classList.add("hidden");
+        document.getElementById("liveViewportSection").classList.add("hidden");
+        setStepProgress(1, false);
+        updateCdkBadges("stopped");
+        document.getElementById("processStatusText").textContent = "⏹ Đã dừng / đóng cửa sổ kích hoạt (Không trừ lượt CDK)";
+        showToast("Đã đóng phiên — Mã CDK được bảo toàn nguyên vẹn!");
+      });
+
+      // Check CDK Button
+      document.getElementById("btnCheckCdk").addEventListener("click", function () {
+        const code = getNormalizedCdk();
+        const alertBox = document.getElementById("cdkAlertBox");
+        const alertIcon = document.getElementById("cdkAlertIcon");
+        const alertText = document.getElementById("cdkAlertText");
+        alertBox.className = "rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 bg-amber-950/60 border border-amber-500/40 text-amber-300";
+        alertIcon.textContent = "⏳";
+        alertText.textContent = "Đang kiểm tra trạng thái mã " + code + " trên máy chủ...";
+        setTimeout(() => {
+          updateCdkBadges("check");
+        }, 400);
+      });
+
+      // Quick Reset 1 Credit for easy testing
+      document.getElementById("btnQuickResetCdk").addEventListener("click", function () {
+        const code = getNormalizedCdk();
+        cdkStore[code] = { code: code, remaining: 1, totalUsed: 0 };
+        saveCdkStore();
+        updateCdkBadges("stopped");
+        renderCdkAdminTable();
+        showToast('Đã nạp lại 1 lượt kích hoạt cho mã "' + code + '"!');
+      });
+
+      // Quick Paste Fill into active field inside simulated browser
+      document.querySelectorAll("#gEmailInput, #gPasswordInput, #cardNumberInput, #cardExpiryInput, #cardCvvInput, #cardNameInput, #cardZipInput").forEach((el) => {
+        el.addEventListener("focus", () => {
+          currentFocusedInputId = el.id;
+        });
+      });
+
+      document.getElementById("btnQuickPasteFill").addEventListener("click", function () {
+        const val = document.getElementById("quickPasteInput").value;
+        if (!val) {
+          showToast("Hãy nhập nội dung vào ô Dán/Gõ nhanh trước!");
+          return;
+        }
+        const target = document.getElementById(currentFocusedInputId);
+        if (target) {
+          target.value = val;
+          showToast("Đã điền tự động vào ô đang chọn!");
+        }
+      });
+
+      document.getElementById("btnCopyZip").addEventListener("click", function () {
+        try {
+          navigator.clipboard.writeText("97201");
+        } catch (e) {}
+        showToast("Đã copy mã ZIP Mỹ: 97201");
+      });
+
+      // Step Jump buttons for instant previewing
+      document.querySelectorAll(".step-jump-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          showBrowserScreen(this.getAttribute("data-jump"));
+        });
+      });
+
+      // Screen 2A -> 2B -> 2C -> 3
+      document.getElementById("btnLoginEmailNext").addEventListener("click", function () {
+        showBrowserScreen("login-password");
+      });
+      document.getElementById("btnBackToEmail").addEventListener("click", function () {
+        showBrowserScreen("login-email");
+      });
+      document.getElementById("chkShowPass").addEventListener("change", function () {
+        document.getElementById("gPasswordInput").type = this.checked ? "text" : "password";
+      });
+      document.getElementById("btnLoginPassNext").addEventListener("click", function () {
+        showBrowserScreen("login-skip-home");
+      });
+      document.getElementById("btnSkipHomeAddress").addEventListener("click", function () {
+        showBrowserScreen("plans");
+      });
+      document.getElementById("btnSaveHomeAddress").addEventListener("click", function () {
+        showBrowserScreen("plans");
+      });
+
+      // Monthly / Annual Toggle on Google One Plans
+      const btnMonthly = document.getElementById("btnBillingMonthly");
+      const btnAnnual = document.getElementById("btnBillingAnnual");
+      btnMonthly.addEventListener("click", function () {
+        btnMonthly.className = "px-5 py-1.5 rounded-full text-xs font-medium bg-[#c2e7ff] text-[#001d35] transition";
+        btnMonthly.textContent = "✓ Monthly";
+        btnAnnual.className = "px-5 py-1.5 rounded-full text-xs font-medium text-[#1f1f1f] transition";
+        btnAnnual.textContent = "Annual";
+        document.getElementById("priceStorage").innerHTML = '$0<span class="text-xs">/mo</span>';
+        document.getElementById("priceAiPlus").innerHTML = '$1.29<span class="text-xs">/mo</span>';
+        document.getElementById("priceAiPro").innerHTML = '$19.99<span class="text-xs">/mo</span>';
+      });
+      btnAnnual.addEventListener("click", function () {
+        btnAnnual.className = "px-5 py-1.5 rounded-full text-xs font-medium bg-[#c2e7ff] text-[#001d35] transition";
+        btnAnnual.textContent = "✓ Annual";
+        btnMonthly.className = "px-5 py-1.5 rounded-full text-xs font-medium text-[#1f1f1f] transition";
+        btnMonthly.textContent = "Monthly";
+        document.getElementById("priceStorage").innerHTML = '$16.99<span class="text-xs">/yr</span>';
+        document.getElementById("priceAiPlus").innerHTML = '$37.99<span class="text-xs">/yr</span>';
+        document.getElementById("priceAiPro").innerHTML = '$149.99<span class="text-xs">/yr</span>';
+      });
+
+      // Clicking "Get discount" opens Google Play Payment Modal
+      document.querySelectorAll(".btnTriggerDiscount").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          showBrowserScreen("play-methods");
+        });
+      });
+
+      // Google Play Modal Navigation
+      document.getElementById("btnClosePlayModal1").addEventListener("click", function () {
+        showBrowserScreen("plans");
+      });
+      document.getElementById("btnClosePlayModal2").addEventListener("click", function () {
+        showBrowserScreen("plans");
+      });
+      document.getElementById("btnSelectAddCard").addEventListener("click", function () {
+        showBrowserScreen("play-card");
+      });
+      document.querySelectorAll(".btnSelectOtherMethod").forEach((b) => {
+        b.addEventListener("click", function () {
+          showBrowserScreen("play-card");
+        });
+      });
+      document.getElementById("btnBackToMethods").addEventListener("click", function () {
+        showBrowserScreen("play-methods");
+      });
+      document.getElementById("btnSaveCard").addEventListener("click", function () {
+        showBrowserScreen("play-captcha");
+      });
+
+      // Captcha tile toggle
+      document.querySelectorAll(".captcha-tile").forEach((tile) => {
+        tile.addEventListener("click", function () {
+          const chk = this.querySelector(".captcha-check");
+          chk.classList.toggle("hidden");
+          this.classList.toggle("ring-2");
+          this.classList.toggle("ring-blue-600");
+        });
+      });
+
+      document.getElementById("btnVerifyCaptcha").addEventListener("click", function () {
+        showBrowserScreen("play-subscribe");
+      });
+
+      // Final Subscribe Button (02:53 - 03:15 in video)
+      document.getElementById("btnConfirmSubscribe").addEventListener("click", function () {
+        const btn = this;
+        btn.disabled = true;
+        btn.textContent = "Processing...";
+        const pgBanner = document.getElementById("playGuardTopBanner");
+        pgBanner.className = "mb-3 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold text-white bg-amber-600 border border-amber-400 shadow-lg flex items-center gap-2";
+        document.getElementById("playGuardText").textContent = "⏳ ĐANG XỬ LÝ THANH TOÁN: Đang chờ Google Play xác nhận giao dịch (Chưa trừ mã CDK)...";
+        document.getElementById("processStatusText").textContent = "⏳ ĐANG XỬ LÝ THANH TOÁN: Đang chờ Google Play xác nhận giao dịch (Chưa trừ mã CDK)...";
+
+        const tSub = setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = "Subscribe";
+          const code = getNormalizedCdk();
+          if (cdkStore[code] && cdkStore[code].remaining > 0) {
+            cdkStore[code].remaining -= 1;
+            cdkStore[code].totalUsed += 1;
+            saveCdkStore();
+          }
+          sessionActive = false;
+          document.getElementById("btnStopSession").classList.add("hidden");
+          document.getElementById("liveViewportSection").classList.add("hidden");
+          setStepProgress(5, true);
+          updateCdkBadges("completed");
+          document.getElementById("processStatusText").textContent = "🎉 THANH TOÁN THÀNH CÔNG: Đã kích hoạt Gói 12 Tháng ($0.00) — Đã trừ 1 lượt mã CDK!";
+          renderCdkAdminTable();
+          showToast("🎉 Kích hoạt thành công Google AI Pro 12 Tháng ($0.00)!");
+        }, 2000);
+        activeTimers.push(tSub);
+      });
+
+      // Sync Offer Layer Selector & Extension Popup Modal
+      function setOfferLayer(layer) {
+        currentLayer = layer;
+        document.getElementById("offerLayerSelect").value = layer === "off" ? "12m" : layer;
+        const tok = TOKENS[layer] || TOKENS["12m"];
+        document.getElementById("activeTokenPreview").textContent = tok;
+
+        // Update Extension Popup Radio UI
+        document.querySelectorAll("#extRadioGroup .ext-row").forEach((row) => {
+          const rLayer = row.getAttribute("data-layer");
+          const inp = row.querySelector("input");
+          if (rLayer === layer) {
+            row.classList.add("checked");
+            inp.checked = true;
+          } else {
+            row.classList.remove("checked");
+            inp.checked = false;
+          }
+        });
+
+        const stateBox = document.getElementById("extPopupStateBox");
+        if (layer === "off") {
+          stateBox.className = "text-[11.5px] px-3 py-2.5 rounded-[10px] bg-[#fffaed] border border-[#f0e3bc] text-[#886821] font-medium";
+          stateBox.textContent = "Chưa phát hiện tính năng hoạt động (hãy mở one.google.com/plans rồi tải lại trang)";
+        } else {
+          stateBox.className = "text-[11.5px] px-3 py-2.5 rounded-[10px] bg-[#edf9f2] border border-[#ccebd9] text-[#24744c] font-medium";
+          stateBox.textContent = "Đã kích hoạt: " + LAYER_LABELS[layer] + " — Có thể kiểm tra mục Get discount";
+        }
+
+        const btnStart = document.getElementById("btnStartActivation");
+        btnStart.innerHTML = "<span>🚀 Bắt Đầu Kích Hoạt Gói " + (LAYER_LABELS[layer] || "12 Tháng") + "</span>";
+      }
+
+      document.getElementById("offerLayerSelect").addEventListener("change", function () {
+        setOfferLayer(this.value);
+      });
+
+      document.querySelectorAll("#extRadioGroup .ext-row").forEach((row) => {
+        row.addEventListener("click", function () {
+          setOfferLayer(this.getAttribute("data-layer"));
+        });
+      });
+
+      // Extension Modal Open/Close
+      document.getElementById("btnOpenExtModal").addEventListener("click", () => {
+        document.getElementById("extPopupModal").classList.remove("hidden");
+      });
+      document.getElementById("btnOpenExtModal2").addEventListener("click", () => {
+        document.getElementById("extPopupModal").classList.remove("hidden");
+      });
+      document.getElementById("btnCloseExtModal").addEventListener("click", () => {
+        document.getElementById("extPopupModal").classList.add("hidden");
+      });
+
+      // Copy Standalone Console / Tampermonkey Injector Script (From inject.js)
+      function copyInjectorScript() {
+        const layerToUse = currentLayer === "off" ? "12m" : currentLayer;
+        const scriptCode = `/* Google AI Pro 2 Năm - Console / Tampermonkey Offer Injector (${LAYER_LABELS[layerToUse]}) */
+(() => {
+  const PREFIX = "${PREFIX}";
+  const TOKEN = "${TOKENS[layerToUse]}";
+  const YT_FREE_TOK = "${YT_FREE_TOK}";
+  const FULL_ITEMS = [
+    [[PREFIX + "g1.2tb.ai.subs_variant", 21], null, null, null, 1, [TOKEN]],
+    [[PREFIX + "g1.youtube_premium_individual_add_on", 21], null, null, null, 1, [YT_FREE_TOK]]
+  ];
+  window.__GAPT_STATE = { layer: "${layerToUse}", mounted: true };
+  console.log("✅ Đã kích hoạt tiêm Google AI Pro (${LAYER_LABELS[layerToUse]})!");
+})();`;
+        try {
+          navigator.clipboard.writeText(scriptCode);
+        } catch (e) {}
+        showToast("Đã sao chép Script Tiêm Offer (" + LAYER_LABELS[layerToUse] + ") vào Clipboard!");
+      }
+
+      document.getElementById("btnCopyUserscript").addEventListener("click", copyInjectorScript);
+      document.getElementById("btnCopyBookmarklet").addEventListener("click", copyInjectorScript);
+
+      // Post-Activation Check & Cancel Subscription Modal (03:18 - 04:02 in video)
+      const postModal = document.getElementById("postCheckModal");
+      document.getElementById("btnOpenPostCheck").addEventListener("click", () => postModal.classList.remove("hidden"));
+      document.getElementById("btnOpenPostCheck2").addEventListener("click", () => postModal.classList.remove("hidden"));
+      document.getElementById("btnClosePostCheck").addEventListener("click", () => postModal.classList.add("hidden"));
+
+      const tabCheckOne = document.getElementById("tabCheckOne");
+      const tabCancelPlay = document.getElementById("tabCancelPlay");
+      const contentCheckOne = document.getElementById("contentCheckOne");
+      const contentCancelPlay = document.getElementById("contentCancelPlay");
+
+      function switchPostTab(tab) {
+        if (tab === "one") {
+          tabCheckOne.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white";
+          tabCancelPlay.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300";
+          contentCheckOne.classList.remove("hidden");
+          contentCancelPlay.classList.add("hidden");
+        } else {
+          tabCancelPlay.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white";
+          tabCheckOne.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300";
+          contentCancelPlay.classList.remove("hidden");
+          contentCheckOne.classList.add("hidden");
+        }
+      }
+
+      tabCheckOne.addEventListener("click", () => switchPostTab("one"));
+      tabCancelPlay.addEventListener("click", () => switchPostTab("play"));
+      document.getElementById("btnGoToCancelTab").addEventListener("click", () => switchPostTab("play"));
+
+      document.getElementById("btnTriggerCancelSub").addEventListener("click", function () {
+        document.getElementById("subCancelStatusLine").textContent = "Đã hủy • Gói thuê bao của bạn sẽ hết hạn vào 6 thg 11, 2027 (Không bị trừ tiền)";
+        const pill = document.getElementById("subStatusPill");
+        pill.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700";
+        pill.textContent = "Đã hủy gia hạn (Còn 12 tháng)";
+        this.textContent = "✓ Đã hủy gia hạn tự động thành công";
+        this.className = "px-4 py-2 rounded-full bg-emerald-600 text-white text-xs font-semibold";
+        showToast("Đã hủy gia hạn tự động! Gói 12 tháng vẫn giữ nguyên hiệu lực.");
+      });
+
+      // Admin CDK Modal
+      const adminModal = document.getElementById("adminCdkModal");
+      function renderCdkAdminTable() {
+        const container = document.getElementById("cdkTableContainer");
+        container.innerHTML = "";
+        Object.keys(cdkStore).forEach((k) => {
+          const item = cdkStore[k];
+          const row = document.createElement("div");
+          row.className = "px-3.5 py-2.5 flex items-center justify-between gap-2 text-xs";
+          row.innerHTML = `
+            <div>
+              <span class="font-bold text-white font-mono">${item.code}</span>
+              <span class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold ${item.remaining > 0 ? "bg-emerald-950 text-emerald-400" : "bg-red-950 text-red-400"}">
+                Còn ${item.remaining} lượt
+              </span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button type="button" data-use-code="${item.code}" class="btn-select-cdk px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-blue-300">Chọn</button>
+              <button type="button" data-reset-code="${item.code}" class="btn-reset-cdk px-2 py-1 rounded bg-emerald-950 hover:bg-emerald-900 text-emerald-300">+1 Lượt</button>
+            </div>
+          `;
+          container.appendChild(row);
+        });
+
+        container.querySelectorAll(".btn-select-cdk").forEach((b) => {
+          b.addEventListener("click", function () {
+            document.getElementById("cdkInput").value = this.getAttribute("data-use-code");
+            updateCdkBadges("check");
+            adminModal.classList.add("hidden");
+          });
+        });
+
+        container.querySelectorAll(".btn-reset-cdk").forEach((b) => {
+          b.addEventListener("click", function () {
+            const c = this.getAttribute("data-reset-code");
+            cdkStore[c].remaining += 1;
+            saveCdkStore();
+            renderCdkAdminTable();
+            updateCdkBadges("check");
+          });
+        });
+      }
+
+      document.getElementById("btnOpenAdminModal").addEventListener("click", () => {
+        renderCdkAdminTable();
+        adminModal.classList.remove("hidden");
+      });
+      document.getElementById("btnCloseAdminModal").addEventListener("click", () => {
+        adminModal.classList.add("hidden");
+      });
+      document.getElementById("btnAddCdkCode").addEventListener("click", () => {
+        const c = (document.getElementById("newCdkCodeInput").value || "").trim().toUpperCase();
+        const u = parseInt(document.getElementById("newCdkUsesInput").value, 10) || 1;
+        if (!c) return;
+        cdkStore[c] = { code: c, remaining: u, totalUsed: 0 };
+        saveCdkStore();
+        document.getElementById("newCdkCodeInput").value = "";
+        renderCdkAdminTable();
+        document.getElementById("cdkInput").value = c;
+        updateCdkBadges("check");
+        showToast("Đã tạo mã CDK: " + c);
+      });
+
+      // Initialize default view
+      updateCdkBadges("stopped");
+    })();
+  </script>
+</body>
+</html>

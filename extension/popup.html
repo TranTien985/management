@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<title>Google AI Pro · Tiện ích</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    width: 370px; margin: 0; padding: 20px 18px 14px;
+    font: 13px/1.6 -apple-system, "Segoe UI", Roboto, "Microsoft YaHei", sans-serif;
+    color: #28354a; background: linear-gradient(150deg, #eef3ff 0, #f7f9fc 180px);
+  }
+  h1 { font-size: 17px; margin: 0 0 5px; font-weight: 700; letter-spacing: -.4px; color: #1d2c47; }
+  .sub { font-size: 11px; color: #69778d; margin-bottom: 18px; }
+  .box {
+    border: 1px solid #e2e8f2; border-radius: 14px; padding: 12px; margin-bottom: 12px;
+    background: #fff; box-shadow: 0 4px 16px #263b6410;
+  }
+  .lbl { font-size: 11px; color: #69778d; margin: 0 2px 10px; }
+  label.row {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+    border: 1px solid transparent; border-radius: 9px; cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  label.row + label.row { margin-top: 3px; }
+  label.row:hover { background: #f5f7fc; }
+  label.row:has(input:checked) { background: #edf3ff; border-color: #cddcff; color: #2457bd; }
+  label.row:has(input:focus-visible) { outline: 2px solid #507ce0; outline-offset: 2px; }
+  label.row input { margin: 0; width: 15px; height: 15px; accent-color: #416fdb; flex-shrink: 0; }
+  .t { flex: 1; }
+  .tag { font-size: 10px; line-height: 20px; padding: 0 7px; border-radius: 6px; color: #718096; background: #f0f3f8; }
+  label.row:has(input:checked) .tag { color: #2457bd; background: #dce8ff; }
+  #state { font-size: 11.5px; padding: 10px 12px; border-radius: 10px; background: #f1f4f8; border: 1px solid #e2e8f0; }
+  #state.ok { background: #edf9f2; border-color: #ccebd9; color: #24744c; }
+  #state.warn { background: #fffaed; border-color: #f0e3bc; color: #886821; }
+  ol { margin: 14px 0 0; padding-left: 23px; font-size: 11.5px; color: #647187; }
+  ol li { margin: 5px 0; padding-left: 2px; }
+  ol li::marker { color: #8b9bb3; font-weight: 600; }
+  ol b { font-weight: 600; color: #3d4d66; }
+  .foot { margin-top: 14px; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 10.5px; color: #7c899e; display: flex; justify-content: space-between; }
+  .foot a { color: #5674af; text-decoration: none; border-radius: 3px; }
+  .foot a:hover { color: #2457bd; text-decoration: underline; }
+  .foot a:focus-visible { outline: 2px solid #507ce0; outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { label.row { transition: none; } }
+</style>
+</head>
+<body>
+  <h1>Google AI Pro 2 năm · Tiện ích</h1>
+  <div class="sub">Đăng nhập tài khoản cần dùng (khu vực Hoa Kỳ) trên trình duyệt, sau đó chọn tùy chọn</div>
+
+  <div class="box">
+    <div class="lbl">Chế độ áp dụng (tự động lưu khi chọn; hãy tải lại trang)</div>
+    <label class="row"><input type="radio" name="layer" value="off"><span class="t">Tắt tính năng</span></label>
+    <label class="row"><input type="radio" name="layer" value="12m"><span class="t">Lựa chọn 1 · 12 tháng</span><span class="tag">Lần đầu</span></label>
+    <label class="row"><input type="radio" name="layer" value="6m_ss"><span class="t">Lựa chọn 2 · 6 tháng (SS)</span><span class="tag">Tiếp theo</span></label>
+    <label class="row"><input type="radio" name="layer" value="6m"><span class="t">Lựa chọn 3 · 6 tháng</span><span class="tag">Tiếp theo</span></label>
+    <label class="row"><input type="radio" name="layer" value="6m_2"><span class="t">Dự phòng · 6 tháng</span><span class="tag">Dự phòng</span></label>
+  </div>
+
+  <div id="state" class="warn" role="status" aria-live="polite">Chưa phát hiện tính năng hoạt động trên trang này</div>
+
+  <ol>
+    <li>Mở <b>one.google.com/plans</b> và kiểm tra email tài khoản ở góc trên bên trái</li>
+    <li>Chọn một chế độ ở trên → tải lại trang → xem trạng thái ở góc dưới bên phải</li>
+    <li>Nhấn <b>Get discount (Nhận ưu đãi)</b> trên thẻ AI Pro để mở cửa sổ thanh toán Google Play</li>
+    <li>Đọc kỹ điều khoản trong cửa sổ thanh toán; <b>màu xanh = phát hiện dấu hiệu dùng thử</b>, màu đỏ = có dấu hiệu tính phí</li>
+    <li>Kiểm tra phương thức thanh toán, số tiền và các điều khoản trước khi xác nhận đăng ký</li>
+    <li>Để chuyển lựa chọn: quay lại tiện ích → chọn chế độ khác → tải lại trang</li>
+    <li>Nếu không muốn tự động gia hạn, hãy kiểm tra mục gói thuê bao trên play.google.com</li>
+  </ol>
+
+  <div class="foot"><span>Tiện ích cá nhân</span><a href="https://t.me/pk_oa" target="_blank">t.me/pk_oa</a></div>
+  <script src="popup.js"></script>
+</body>
+</html>
